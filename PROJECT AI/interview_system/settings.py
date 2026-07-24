@@ -9,7 +9,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-fallback-key-2026")
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = ["*"]
 
@@ -57,14 +57,13 @@ WSGI_APPLICATION = "interview_system.wsgi.application"
 
 # Vercel Writable SQLite Fix
 DB_PATH = BASE_DIR / "db.sqlite3"
-if os.getenv("VERCEL") or True:
-    TMP_DB = Path("/tmp/db.sqlite3")
-    if DB_PATH.exists() and not TMP_DB.exists():
-        try:
-            shutil.copyfile(DB_PATH, TMP_DB)
-        except Exception:
-            pass
-    DB_PATH = TMP_DB
+TMP_DB = Path("/tmp/db.sqlite3")
+if DB_PATH.exists() and not TMP_DB.exists():
+    try:
+        shutil.copyfile(DB_PATH, TMP_DB)
+    except Exception:
+        pass
+DB_PATH = TMP_DB
 
 DATABASES = {
     "default": {
