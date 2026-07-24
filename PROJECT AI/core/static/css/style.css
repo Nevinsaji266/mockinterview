@@ -1,0 +1,369 @@
+/* 
+   ==========================================================================
+   Premium Dark Glassmorphism Stylesheet - AI Mock Interview System
+   ==========================================================================
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-gradient: linear-gradient(135deg, #0d1127 0%, #070913 100%);
+    --panel-bg: rgba(20, 25, 45, 0.45);
+    --panel-border: rgba(255, 255, 255, 0.08);
+    --panel-glow: rgba(0, 229, 255, 0.15);
+    
+    --primary-cyan: #00e5ff;
+    --primary-purple: #8e24aa;
+    --primary-violet: #7c4dff;
+    
+    --text-primary: #f5f6fa;
+    --text-secondary: #a0a5c0;
+    
+    --glow-btn: 0 0 15px rgba(0, 229, 255, 0.4);
+    --glow-btn-hover: 0 0 25px rgba(0, 229, 255, 0.8), 0 0 10px rgba(124, 77, 255, 0.5);
+}
+
+body {
+    background: var(--bg-gradient);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+}
+
+/* Glassmorphism Card Utility */
+.glass-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.glass-card:hover {
+    border-color: rgba(0, 229, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 229, 255, 0.08);
+}
+
+/* Navbar */
+.glass-navbar {
+    background: rgba(13, 17, 39, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--panel-border);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: linear-gradient(45deg, var(--primary-cyan), #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-link {
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary-cyan) !important;
+}
+
+/* Buttons */
+.btn-glass-primary {
+    background: linear-gradient(135deg, var(--primary-cyan) 0%, var(--primary-violet) 100%);
+    border: none;
+    color: #070913;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    box-shadow: var(--glow-btn);
+    transition: all 0.3s ease;
+}
+
+.btn-glass-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--glow-btn-hover);
+    color: #ffffff;
+}
+
+.btn-glass-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--panel-border);
+    color: var(--text-primary);
+    font-weight: 500;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.btn-glass-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Form Controls */
+.glass-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--primary-cyan);
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.25);
+    outline: none;
+    color: var(--text-primary);
+}
+
+/* Custom Circle Progress (ATS Gauge) */
+.progress-circle {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary-cyan) calc(var(--progress-val) * 1%), rgba(255, 255, 255, 0.05) 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.1);
+}
+
+.progress-circle::before {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: #0d1127;
+}
+
+.progress-circle-val {
+    position: relative;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    color: var(--primary-cyan);
+}
+
+/* Live Interview Interface */
+.interview-box {
+    min-height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.voice-wave-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+}
+
+/* Recording Pulse Waves */
+.mic-btn-container {
+    position: relative;
+    display: inline-block;
+}
+
+.mic-btn {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff1744 0%, #d500f9 100%);
+    border: none;
+    color: white;
+    font-size: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 20px rgba(255, 23, 68, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+    position: relative;
+}
+
+.mic-btn:hover {
+    transform: scale(1.05);
+}
+
+.mic-btn.recording {
+    background: #ff1744;
+    animation: pulse-red 1.5s infinite;
+}
+
+.pulse-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid #ff1744;
+    opacity: 0;
+    animation: ripple 1.5s infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.7);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse-red {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 23, 68, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 20px rgba(255, 23, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 23, 68, 0);
+    }
+}
+
+/* Sound Wave Bars */
+.sound-waves {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 40px;
+    margin-top: 15px;
+}
+
+.sound-waves.active {
+    display: flex;
+}
+
+.wave-bar {
+    width: 4px;
+    height: 10px;
+    background-color: var(--primary-cyan);
+    border-radius: 4px;
+    animation: wave-bounce 1s ease-in-out infinite alternate;
+}
+
+.wave-bar:nth-child(2) { animation-delay: 0.1s; height: 18px; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; height: 26px; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; height: 35px; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; height: 22px; }
+.wave-bar:nth-child(6) { animation-delay: 0.15s; height: 30px; }
+.wave-bar:nth-child(7) { animation-delay: 0.25s; height: 15px; }
+
+@keyframes wave-bounce {
+    0% { transform: scaleY(0.4); }
+    100% { transform: scaleY(1.4); }
+}
+
+/* Chat bubble feedback */
+.coach-bubble {
+    background: rgba(142, 36, 170, 0.25);
+    border-left: 4px solid var(--primary-violet);
+    padding: 1.25rem;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+    position: relative;
+    animation: slide-up 0.5s ease-out;
+}
+
+@keyframes slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom list items */
+.custom-list {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.custom-list li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+}
+
+.custom-list-strength li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #00e676;
+    font-weight: bold;
+}
+
+.custom-list-weakness li::before {
+    content: "✗";
+    position: absolute;
+    left: 0;
+    color: #ff1744;
+    font-weight: bold;
+}
+
+.custom-list-suggestion li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--primary-cyan);
+    font-weight: bold;
+}
+
+.badge-cyan {
+    background-color: rgba(0, 229, 255, 0.15);
+    color: var(--primary-cyan);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+}
+
+.badge-purple {
+    background-color: rgba(142, 36, 170, 0.15);
+    color: #d500f9;
+    border: 1px solid rgba(142, 36, 170, 0.3);
+}
+
+/* Loading animations */
+.glow-loader {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(0, 229, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-cyan);
+    animation: spin 1s ease-in-out infinite;
+    display: inline-block;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}

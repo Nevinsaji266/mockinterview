@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block title %}Interview Report - {{ session.job_role }}{% endblock %}
+
+{% block content %}
+<!-- Print styles -->
+<style>
+    @media print {
+        body { background: white !important; color: black !important; }
+        .glass-navbar, footer, .no-print { display: none !important; }
+        .glass-card { 
+            background: white !important; 
+            border: 1px solid #ccc !important; 
+            box-shadow: none !important; 
+            color: black !important;
+            backdrop-filter: none !important;
+        }
+        .text-light { color: black !important; }
+        .text-secondary { color: #555 !important; }
+        .badge { border: 1px solid #000 !important; color: black !important; background: transparent !important; }
+        .progress-circle::before { background: white !important; }
+    }
+</style>
+
+<div class="row align-items-center mb-4 no-print">
+    <div class="col-sm-6">
+        <a href="{% url 'dashboard' %}" class="btn btn-sm btn-glass-secondary">
+            <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+    <div class="col-sm-6 text-sm-end mt-2 mt-sm-0">
+        <button onclick="window.print()" class="btn btn-sm btn-glass-primary">
+            <i class="fa-solid fa-print me-2"></i>Print / Save PDF
+        </button>
+    </div>
+</div>
+
+<!-- Header Card -->
+<div class="glass-card mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-3 d-flex justify-content-center mb-3 mb-md-0">
+            <div class="progress-circle" style="--progress-val: {{ report.overall_score }}; width: 160px; height: 160px;">
+                <div class="progress-circle-val" style="font-size: 2.3rem;">{{ report.overall_score }}%</div>
+            </div>
+        </div>
+        <div class="col-md-9 text-center text-md-start">
+            <span class="badge badge-purple mb-2">Evaluation Completed</span>
+            <h1 class="text-light mb-1">{{ session.job_role }} Mock Interview</h1>
+            <p class="text-secondary mb-3">Target Company: <strong class="text-light">{{ session.company }}</strong> | Difficulty: {{ session.difficulty }}</p>
+            
+            <div class="p-3 rounded bg-dark bg-opacity-20 border border-secondary border-opacity-10 d-inline-block">
+                <span class="text-secondary small d-block mb-1">Final Decision Panel</span>
+                <span class="fs-5 fw-bold {% if 'Strong Hire' in report.final_decision or 'Hire' in report.final_decision %}text-success{% else %}text-danger{% endif %}">
+                    {{ report.final_decision }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <!-- Key Synthesized Assessments -->
+    <div class="col-md-6">
+        <div class="glass-card h-100">
+            <h3 class="text-light mb-3"><i class="fa-solid fa-microchip text-cyan me-2"></i>Technical Assessment</h3>
+            <p class="text-secondary small leading-relaxed">
+                {{ report.technical_assessment }}
+            </p>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="glass-card h-100">
+            <h3 class="text-light mb-3"><i class="fa-solid fa-bullhorn text-cyan me-2"></i>Communication Assessment</h3>
+            <p class="text-secondary small leading-relaxed">
+                {{ report.communication_assessment }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Vocal Confidence & Pacing Analysis -->
+{% if report.voice_analysis %}
+<div class="glass-card mb-4 border border-cyan border-opacity-20" style="background: rgba(124, 77, 255, 0.03);">
+    <div class="row align-items-center mb-4">
+        <div class="col-md-8">
+            <h3 class="text-light mb-2"><i class="fa-solid fa-microphone-lines text-cyan me-2"></i>Vocal Confidence & Pacing Analysis</h3>
+            <p class="text-secondary small mb-0">Our Speech Analysis Agent reviews structural pacing, vocal confidence, and filler word usage from your microphone transcript stream.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-block p-3 rounded bg-dark bg-opacity-25 border border-secondary border-opacity-10">
+                <span class="text-secondary small d-block mb-1">Vocal Confidence</span>
+                <span class="fs-4 fw-bold text-cyan">{{ report.voice_analysis.vocal_confidence_score }}/100</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <!-- Average WPM Card -->
+        <div class="col-md-4">
+            <div class="p-3 rounded border border-secondary border-opacity-10 bg-dark bg-opacity-10 text-center">
+                <span class="text-secondary small d-block mb-1">Average Pacing</span>
+                <span class="fs-3 fw-bold text-light d-block">{{ report.voice_analysis.average_wpm }} <small class="text-secondary fs-6">WPM</small></span>
+                <span class="badge bg-opacity-20 {% if report.voice_analysis.average_wpm >= 110 and report.voice_analysis.average_wpm <= 160 %}bg-success text-success{% else %}bg-warning text-warning{% endif %} mt-2">
+                    {% if report.voice_analysis.average_wpm < 110 %}Too Slow{% elif report.voice_analysis.average_wpm <= 160 %}Optimal Pacing{% else %}Too Fast{% endif %}
+                </span>
+            </div>
+        </div>
+        <!-- Total Filler Words Card -->
+        <div class="col-md-4">
+            <div class="p-3 rounded border border-secondary border-opacity-10 bg-dark bg-opacity-10 text-center">
+                <span class="text-secondary small d-block mb-1">Total Filler Words</span>
+                <span class="fs-3 fw-bold text-light d-block">{{ report.voice_analysis.total_fillers }}</span>
+                <span class="badge bg-opacity-20 {% if report.voice_analysis.total_fillers < 10 %}bg-success text-success{% elif report.voice_analysis.total_fillers <= 20 %}bg-warning text-warning{% else %}bg-danger text-danger{% endif %} mt-2">
+                    {% if report.voice_analysis.total_fillers < 10 %}Excellent Control{% elif report.voice_analysis.total_fillers <= 20 %}Moderate Filler Usage{% else %}High Filler Usage{% endif %}
+                </span>
+            </div>
+        </div>
+        <!-- Speech Pacing Feedback Card -->
+        <div class="col-md-4">
+            <div class="p-3 rounded border border-secondary border-opacity-10 bg-dark bg-opacity-10 text-center">
+                <span class="text-secondary small d-block mb-1">Speech Clarity & Recognition</span>
+                <span class="fs-3 fw-bold text-light d-block">High Clarity</span>
+                <span class="badge bg-success bg-opacity-20 text-success mt-2">Continuous Stream</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3 mb-md-0">
+            <h5 class="text-cyan small uppercase mb-2">Pacing Feedback</h5>
+            <p class="text-secondary small leading-relaxed mb-0">
+                {{ report.voice_analysis.pacing_feedback }}
+            </p>
+        </div>
+        <div class="col-md-6">
+            <h5 class="text-cyan small uppercase mb-2">Vocal Improvement Tips</h5>
+            <ul class="custom-list custom-list-suggestion text-secondary small mb-0">
+                {% for tip in report.voice_analysis.recommendations %}
+                    <li>{{ tip }}</li>
+                {% empty %}
+                    <li>Practice speaking at a steady rate of 130 WPM.</li>
+                    <li>Pause consciously instead of using filler words.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row g-4 mb-5">
+    <!-- Strengths & Weaknesses -->
+    <div class="col-md-7">
+        <div class="glass-card h-100">
+            <h3 class="text-light mb-4"><i class="fa-solid fa-chart-line text-cyan me-2"></i>Key Performance Indicators</h3>
+            <div class="row">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <h5 class="text-success mb-3"><i class="fa-solid fa-check me-2"></i>Top Strengths</h5>
+                    <ul class="custom-list custom-list-strength text-secondary small">
+                        {% for str in report.key_strengths %}
+                            <li>{{ str }}</li>
+                        {% empty %}
+                            <li>Structured logic</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-danger mb-3"><i class="fa-solid fa-triangle-exclamation me-2"></i>Top Gaps</h5>
+                    <ul class="custom-list custom-list-weakness text-secondary small">
+                        {% for wk in report.key_weaknesses %}
+                            <li>{{ wk }}</li>
+                        {% empty %}
+                            <li>Technical depth under pressure</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Development Plan -->
+    <div class="col-md-5">
+        <div class="glass-card h-100">
+            <h3 class="text-light mb-4"><i class="fa-solid fa-graduation-cap text-cyan me-2"></i>Actionable Study Plan</h3>
+            <ul class="custom-list custom-list-suggestion text-secondary small">
+                {% for item in report.development_plan %}
+                    <li>{{ item }}</li>
+                {% empty %}
+                    <li>Review STAR formatting templates</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Question Wise Breakdowns -->
+<h3 class="text-light mb-4 d-flex align-items-center">
+    <i class="fa-solid fa-list-check text-cyan me-2"></i>Question-by-Question Transcript Logs
+</h3>
+
+{% for q in questions %}
+    <div class="glass-card mb-4 border border-secondary border-opacity-10">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <span class="badge badge-purple me-2">Q{{ q.order }}</span>
+                <span class="badge badge-cyan">{{ q.category }}</span>
+            </div>
+            <span class="badge bg-opacity-20 {% if q.score >= 80 %}bg-success text-success{% else %}bg-warning text-warning{% endif %}">
+                Score: {{ q.score }}/100
+            </span>
+        </div>
+        
+        <!-- Question Asked -->
+        <h4 class="text-light fs-5 mb-3">{{ q.question_text }}</h4>
+        
+        <!-- Voice Metrics for this question -->
+        {% if q.voice_metrics_json %}
+        <div class="mb-3 d-flex flex-wrap gap-4 p-2 bg-dark bg-opacity-20 rounded border border-secondary border-opacity-10 no-print" style="margin-left: 2px;">
+            <span class="small text-secondary"><i class="fa-regular fa-clock text-cyan me-1"></i>Duration: <strong class="text-light">{{ q.voice_metrics_json.duration_seconds }}s</strong></span>
+            <span class="small text-secondary"><i class="fa-solid fa-gauge text-cyan me-1"></i>Pacing: <strong class="text-light">{{ q.voice_metrics_json.words_per_minute }} WPM</strong></span>
+            <span class="small text-secondary"><i class="fa-solid fa-triangle-exclamation text-cyan me-1"></i>Fillers: <strong class="text-light">{{ q.voice_metrics_json.filler_words_count }}</strong></span>
+            <span class="small text-secondary"><i class="fa-regular fa-circle-check text-cyan me-1"></i>Clarity: <strong class="text-light">{{ q.voice_metrics_json.average_confidence }}%</strong></span>
+        </div>
+        {% endif %}
+
+        
+        <!-- User Response -->
+        <div class="mb-4">
+            <strong class="text-secondary small d-block mb-1">Your Voice Answer Transcript:</strong>
+            <div class="p-3 border border-secondary border-opacity-10 rounded text-light bg-dark bg-opacity-20 small" style="font-style: italic;">
+                "{{ q.user_response }}"
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6 mb-3 mb-md-0">
+                <strong class="text-success small d-block mb-1">Strengths:</strong>
+                <ul class="custom-list custom-list-strength text-secondary small">
+                    {% for str in q.evaluation_json.strengths %}
+                        <li>{{ str }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <strong class="text-danger small d-block mb-1">Gaps / Improvement Points:</strong>
+                <ul class="custom-list custom-list-weakness text-secondary small">
+                    {% for wk in q.evaluation_json.weaknesses %}
+                        <li>{{ wk }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Correctness / Delivery Assessments -->
+        <div class="mb-4 border-top border-secondary border-opacity-10 pt-3">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <strong class="text-cyan small d-block mb-1">Technical Correctness:</strong>
+                    <p class="text-secondary small mb-0">{{ q.evaluation_json.technical_correctness }}</p>
+                </div>
+                <div class="col-md-6">
+                    <strong class="text-cyan small d-block mb-1">Communication & Delivery:</strong>
+                    <p class="text-secondary small mb-0">{{ q.evaluation_json.communication_quality }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reference Answer -->
+        <div class="border-top border-secondary border-opacity-10 pt-3 bg-dark bg-opacity-10 p-3 rounded">
+            <strong class="text-cyan small d-block mb-1"><i class="fa-solid fa-award me-1"></i>Reference Model Answer:</strong>
+            <p class="text-secondary small mb-0" style="font-style: italic;">
+                "{{ q.evaluation_json.model_answer }}"
+            </p>
+        </div>
+    </div>
+{% endfor %}
+
+{% endblock %}

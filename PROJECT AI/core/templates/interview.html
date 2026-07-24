@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Live Interview - TalentAI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-md-11">
+        <!-- Header Info -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <span class="badge badge-cyan mb-2">{{ session.difficulty }} Mode</span>
+                <h2 class="text-light mb-1">{{ session.job_role }}</h2>
+                <p class="text-secondary mb-0">Interviewing at <strong class="text-light">{{ session.company }}</strong></p>
+            </div>
+            <div class="text-end">
+                <span id="question-progress" class="text-secondary small">Question 1 of 5</span>
+                <div class="progress mt-2" style="width: 150px; height: 6px; background-color: rgba(255,255,255,0.05);">
+                    <div id="progress-bar" class="progress-bar bg-cyan" role="progressbar" style="width: 20%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Panel -->
+        <div id="question-card" class="glass-card mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span id="question-category" class="badge badge-purple px-3 py-2 fs-6">Technical</span>
+                <button class="btn btn-sm btn-glass-secondary" onclick="window.speechManager.speak(document.getElementById('question-text').textContent)">
+                    <i class="fa-solid fa-volume-high"></i> Replay Voice
+                </button>
+            </div>
+            <h3 id="question-text" class="text-light leading-relaxed mb-0">
+                Loading question...
+            </h3>
+        </div>
+
+        <!-- Recording & Voice Response Workspace -->
+        <div class="glass-card mb-4 text-center py-5">
+            <h4 class="text-light mb-4">Speak Your Response</h4>
+            
+            <div class="voice-wave-container mb-4">
+                <div class="mic-btn-container">
+                    <button id="mic-btn" class="mic-btn" disabled>
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                    <div id="pulse-ring" class="pulse-ring" style="display: none;"></div>
+                </div>
+            </div>
+
+            <!-- Soundwave visual animations -->
+            <div id="sound-waves" class="sound-waves mb-3">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+
+            <p id="recording-status" class="text-secondary small">Interviewer is speaking...</p>
+
+            <!-- Transcript preview box -->
+            <div class="mt-4 col-md-10 mx-auto">
+                <label class="form-label text-secondary small d-block mb-2">Transcript Preview</label>
+                <div id="transcript-preview" class="p-3 border border-secondary border-opacity-10 rounded text-light small text-start bg-dark bg-opacity-20" 
+                     style="min-height: 80px; max-height: 200px; overflow-y: auto; font-style: italic;">
+                    Your transcribed answer will appear here. Press the record button below to start.
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {% csrf_token %}
+                <button id="submit-btn" class="btn btn-glass-primary px-4 py-2" disabled>
+                    <i class="fa-solid fa-paper-plane me-2"></i>Submit Answer
+                </button>
+            </div>
+        </div>
+
+        <!-- Real-time Loading Spinner -->
+        <div id="evaluation-loader" class="glass-card text-center py-4 mb-4" style="display: none;">
+            <div class="glow-loader mb-3"></div>
+            <h5 class="text-light">Answer Evaluation Agent analyzing response...</h5>
+            <p class="text-secondary small mb-0">Grading technical accuracy, grammar, and delivery...</p>
+        </div>
+
+        <!-- Real-Time Evaluation Feedback (Hidden initially) -->
+        <div id="feedback-panel" class="glass-card mb-4" style="display: none; border-color: rgba(124, 77, 255, 0.4);">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-light mb-0">
+                    <i class="fa-solid fa-head-side-virus text-cyan me-2"></i>AI Interviewer Feedback
+                </h4>
+                <div class="text-end">
+                    <span class="text-secondary small d-block">Question Score</span>
+                    <span id="score-badge" class="badge bg-success bg-opacity-20 text-success fs-5 px-3 py-1">85/100</span>
+                </div>
+            </div>
+
+            <!-- Coach encouragement buble -->
+            <div class="coach-bubble mb-4">
+                <div class="d-flex">
+                    <i class="fa-solid fa-comment-dots text-cyan fs-4 me-3 mt-1"></i>
+                    <div>
+                        <strong class="text-light d-block mb-1">Coach Notes:</strong>
+                        <p id="feedback-text" class="text-secondary mb-0 small leading-relaxed">
+                            Good details. Mentioning specific libraries was strong, but you could structure the response using the STAR method.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strengths and Weaknesses -->
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h5 class="text-success small uppercase mb-2"><i class="fa-solid fa-circle-check me-2"></i>Strengths</h5>
+                    <ul id="strengths-list" class="custom-list custom-list-strength text-secondary small">
+                        <li>Excellent description of Django middleware structure.</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-danger small uppercase mb-2"><i class="fa-solid fa-triangle-exclamation me-2"></i>Gaps / Weaknesses</h5>
+                    <ul id="weaknesses-list" class="custom-list custom-list-weakness text-secondary small">
+                        <li>Forgot to clarify order precedence in custom middleware configs.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Model Reference Answer -->
+            <div class="mt-4 border-top border-secondary border-opacity-10 pt-4">
+                <h5 class="text-cyan mb-2"><i class="fa-solid fa-award me-2"></i>Reference Model Answer</h5>
+                <p id="model-answer-text" class="text-secondary small leading-relaxed mb-0 bg-dark bg-opacity-10 p-3 rounded" style="font-style: italic;">
+                    "Here is what a perfect answer would sound like..."
+                </p>
+            </div>
+
+            <div class="text-end mt-4">
+                <button id="next-btn" class="btn btn-glass-primary">Next Question</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Render Questions to JS safely -->
+{{ questions_json|json_script:"questions-data" }}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/speech.js' %}?v={% now 'U' %}"></script>
+<script src="{% static 'js/interview.js' %}?v={% now 'U' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const sessionId = "{{ session.id }}";
+        const questions = JSON.parse(document.getElementById("questions-data").textContent);
+        const controller = new InterviewController(sessionId, questions);
+    });
+</script>
+{% endblock %}

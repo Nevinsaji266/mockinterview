@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Setup Mock Interview - TalentAI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <!-- Configuration Card -->
+        <div id="setup-card" class="glass-card">
+            <h2 class="mb-2 text-center text-light">
+                <i class="fa-solid fa-sliders text-cyan me-2"></i>Configure Mock Interview
+            </h2>
+            <p class="text-secondary text-center mb-4">
+                Our AI Question Agent will read your resume, pull target skills from our vector index, and design custom questions.
+            </p>
+
+            <form method="POST" id="setup-form">
+                {% csrf_token %}
+                
+                <!-- Target Company -->
+                <div class="mb-4">
+                    <label for="company" class="form-label text-light">Target Company</label>
+                    <input type="text" name="company" id="company" class="form-control glass-input w-100" required 
+                           placeholder="e.g. Google, Amazon, Meta, Spotify, or a local startup">
+                    <div class="form-text text-secondary">
+                        Top-tier companies (e.g. Google, Amazon, Meta) will trigger higher standards, rigorous coding/design, and behavioral queries aligned with their hiring principles.
+                    </div>
+                </div>
+
+                <!-- Job Role -->
+                <div class="mb-4">
+                    <label for="job_role" class="form-label text-light">Target Job Role</label>
+                    <input type="text" name="job_role" id="job_role" class="form-control glass-input w-100" required 
+                           placeholder="e.g. Python Django Developer, React Developer, Data Engineer">
+                </div>
+
+                <!-- Difficulty Level -->
+                <div class="mb-4">
+                    <label class="form-label text-light d-block">Interview Difficulty</label>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="difficulty" id="diff-easy" value="Easy">
+                            <label class="btn btn-outline-secondary w-100 py-3" for="diff-easy">
+                                <i class="fa-solid fa-seedling d-block mb-1 fs-5 text-success"></i> Easy
+                            </label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="difficulty" id="diff-medium" value="Medium" checked>
+                            <label class="btn btn-outline-secondary w-100 py-3" for="diff-medium">
+                                <i class="fa-solid fa-graduation-cap d-block mb-1 fs-5 text-info"></i> Medium
+                            </label>
+                        </div>
+                        <div class="col-4">
+                            <input type="radio" class="btn-check" name="difficulty" id="diff-hard" value="Hard">
+                            <label class="btn btn-outline-secondary w-100 py-3" for="diff-hard">
+                                <i class="fa-solid fa-fire d-block mb-1 fs-5 text-danger"></i> Hard
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button type="submit" class="btn btn-glass-primary w-100 py-3 mt-3">
+                    <i class="fa-solid fa-circle-play me-2"></i>Generate Spoken Interview
+                </button>
+            </form>
+        </div>
+
+        <!-- Loading Screen (Hidden by default) -->
+        <div id="loading-card" class="glass-card text-center py-5" style="display: none;">
+            <div class="glow-loader mb-4"></div>
+            <h3 class="text-light mb-3">Assembling Interview Panel...</h3>
+            <div class="col-md-10 mx-auto text-secondary">
+                <p class="mb-2"><i class="fa-solid fa-microchip text-cyan me-2"></i>RAG Agent querying FAISS database for resume highlights...</p>
+                <p class="mb-2"><i class="fa-solid fa-briefcase text-cyan me-2"></i>Question Agent tailoring interview standard to company profile...</p>
+                <p class="mb-0"><i class="fa-solid fa-gear fa-spin text-cyan me-2"></i>Drafting Technical, Behavioral, and HR questions...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("setup-form").addEventListener("submit", function() {
+        document.getElementById("setup-card").style.display = "none";
+        document.getElementById("loading-card").style.display = "block";
+    });
+</script>
+{% endblock %}

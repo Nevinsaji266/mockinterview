@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - TalentAI{% endblock %}
+
+{% block content %}
+<div class="row mb-5">
+    <div class="col">
+        <h1 class="text-light mb-2">Welcome, {{ user.username }}!</h1>
+        <p class="text-secondary">Analyze your resume, track your interview history, and master your technical skills.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Resume & ATS Analysis -->
+    <div class="col-lg-7">
+        <div class="glass-card mb-4">
+            <h3 class="mb-4 text-light d-flex align-items-center">
+                <i class="fa-solid fa-file-pdf text-cyan me-2"></i> Resume Analysis
+            </h3>
+
+            {% if profile.resume %}
+                <!-- ATS Score Gauge & Summary -->
+                <div class="row align-items-center mb-4">
+                    <div class="col-md-4 d-flex justify-content-center mb-3 mb-md-0">
+                        <div class="progress-circle" style="--progress-val: {{ profile.ats_score }};">
+                            <div class="progress-circle-val">{{ profile.ats_score }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4 class="text-cyan mb-1">{{ profile.analysis_json.name|default:"Candidate" }}</h4>
+                        <p class="text-secondary small mb-2">
+                            Last Updated: {{ profile.updated_at|date:"M d, Y H:i" }}
+                        </p>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for cert in profile.analysis_json.certifications|slice:":3" %}
+                                <span class="badge badge-cyan small">{{ cert }}</span>
+                            {% empty %}
+                                <span class="badge badge-cyan small">Resume Parsed</span>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-3">
+                            <a href="{{ profile.resume.url }}" target="_blank" class="btn btn-sm btn-glass-secondary me-2">
+                                <i class="fa-solid fa-eye me-1"></i> View Resume
+                            </a>
+                            <button class="btn btn-sm btn-glass-secondary" data-bs-toggle="collapse" data-bs-target="#reuploadForm">
+                                <i class="fa-solid fa-cloud-arrow-up me-1"></i> Re-upload
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Re-upload Form (Hidden by default) -->
+                <div class="collapse mb-4" id="reuploadForm">
+                    <form method="POST" action="{% url 'upload_resume' %}" enctype="multipart/form-data" class="p-3 border border-secondary border-opacity-10 rounded">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="resume" class="form-label text-secondary small">Choose new PDF resume</label>
+                            <input type="file" name="resume" id="resume" class="form-control glass-input" accept=".pdf" required>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-glass-primary w-100">Upload and Process</button>
+                    </form>
+                </div>
+
+                <!-- Analysis Tabs -->
+                <nav class="mb-3">
+                    <div class="nav nav-tabs border-secondary border-opacity-10" id="analysis-tab" role="tablist">
+                        <button class="nav-link active" id="skills-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-skills" type="button" role="tab">Skills</button>
+                        <button class="nav-link" id="feedback-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-feedback" type="button" role="tab">ATS Feedback</button>
+                        <button class="nav-link" id="suggestions-tab-btn" data-bs-toggle="tab" data-bs-target="#tab-suggestions" type="button" role="tab">Suggestions</button>
+                    </div>
+                </nav>
+                <div class="tab-content" id="analysis-tab-content">
+                    <!-- Skills -->
+                    <div class="tab-pane fade show active py-3" id="tab-skills" role="tabpanel">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for skill in profile.analysis_json.skills %}
+                                <span class="badge badge-purple px-3 py-2 fs-6">{{ skill }}</span>
+                            {% empty %}
+                                <p class="text-secondary">No skills identified.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- ATS Feedback -->
+                    <div class="tab-pane fade py-3" id="tab-feedback" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h5 class="text-success"><i class="fa-solid fa-circle-check me-2"></i>Strengths</h5>
+                                <ul class="custom-list custom-list-strength text-secondary small">
+                                    {% for strength in profile.analysis_json.strengths %}
+                                        <li>{{ strength }}</li>
+                                    {% empty %}
+                                        <li>Clear structure</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h5 class="text-danger"><i class="fa-solid fa-circle-xmark me-2"></i>Areas to Improve</h5>
+                                <ul class="custom-list custom-list-weakness text-secondary small">
+                                    {% for weakness in profile.analysis_json.weaknesses %}
+                                        <li>{{ weakness }}</li>
+                                    {% empty %}
+                                        <li>Add quantitative achievements</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggestions -->
+                    <div class="tab-pane fade py-3" id="tab-suggestions" role="tabpanel">
+                        <h5 class="text-cyan mb-3"><i class="fa-solid fa-lightbulb me-2"></i>Actionable suggestions</h5>
+                        <ul class="custom-list custom-list-suggestion text-secondary small">
+                            {% for suggestion in profile.analysis_json.suggestions %}
+                                <li>{{ suggestion }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% if profile.analysis_json.missing_keywords %}
+                            <h5 class="text-warning mt-4 mb-3"><i class="fa-solid fa-key me-2"></i>Missing Target Keywords</h5>
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for kw in profile.analysis_json.missing_keywords %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-2 py-1 small">{{ kw }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- Upload CTA -->
+                <div class="text-center py-5">
+                    <i class="fa-solid fa-cloud-arrow-up text-cyan fs-1 mb-3"></i>
+                    <h4>Upload Your Resume</h4>
+                    <p class="text-secondary col-md-10 mx-auto mb-4">
+                        Please upload your resume in PDF format. Our AI Agents will extract skills, education, calculate an ATS score, and configure context-aware questions.
+                    </p>
+                    <form method="POST" action="{% url 'upload_resume' %}" enctype="multipart/form-data" class="col-md-8 mx-auto">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <input type="file" name="resume" class="form-control glass-input" accept=".pdf" required>
+                        </div>
+                        <button type="submit" class="btn btn-glass-primary w-100">Upload & Analyze Resume</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Right Column: Interviews & Start CTA -->
+    <div class="col-lg-5">
+        <div class="glass-card mb-4">
+            <h3 class="mb-4 text-light d-flex align-items-center">
+                <i class="fa-solid fa-play text-cyan me-2"></i> Launch Interview
+            </h3>
+            {% if profile.resume %}
+                <p class="text-secondary small">
+                    Your resume vector store is indexed in our FAISS database. Ready to test your skills?
+                </p>
+                <a href="{% url 'setup_interview' %}" class="btn btn-glass-primary w-100 py-3">
+                    <i class="fa-solid fa-rocket me-2"></i> Configure Mock Interview
+                </a>
+            {% else %}
+                <p class="text-secondary small">
+                    Please upload your resume to build a RAG Vector database before launching mock interviews.
+                </p>
+                <button class="btn btn-glass-primary w-100 py-3" disabled>
+                    <i class="fa-solid fa-lock me-2"></i> Upload Resume First
+                </button>
+            {% endif %}
+        </div>
+
+        <div class="glass-card">
+            <h3 class="mb-4 text-light d-flex align-items-center">
+                <i class="fa-solid fa-history text-cyan me-2"></i> Interview History
+            </h3>
+            
+            <div style="max-height: 400px; overflow-y: auto;">
+                {% for session in sessions %}
+                    <div class="p-3 mb-3 border border-secondary border-opacity-10 rounded hover-glow" style="transition: all 0.3s;">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="mb-1 text-light fs-6">{{ session.job_role }}</h5>
+                                <p class="text-secondary mb-0 small">at {{ session.company }}</p>
+                            </div>
+                            <span class="badge bg-opacity-20 {% if session.overall_score >= 80 %}bg-success text-success{% else %}bg-warning text-warning{% endif %}">
+                                Score: {{ session.overall_score }}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="text-secondary small">
+                                <i class="fa-regular fa-calendar me-1"></i> {{ session.created_at|date:"M d, Y" }}
+                            </span>
+                            <a href="{% url 'interview_report' session.id %}" class="btn btn-sm btn-glass-secondary py-1 px-3 small">
+                                <i class="fa-solid fa-chart-pie me-1"></i> Report
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-4 text-secondary">
+                        <i class="fa-regular fa-clipboard fs-2 mb-2"></i>
+                        <p class="mb-0 small">No interview sessions yet.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Login - TalentAI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="glass-card">
+            <h2 class="text-center mb-4">
+                <i class="fa-solid fa-right-to-bracket text-cyan me-2"></i>Login
+            </h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control glass-input w-100" id="username" required placeholder="Enter username">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control glass-input w-100" id="password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn btn-glass-primary w-100 mb-3">Sign In</button>
+            </form>
+            <p class="text-center text-secondary mb-0">
+                Don't have an account? <a href="{% url 'register' %}" class="text-cyan text-decoration-none">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
