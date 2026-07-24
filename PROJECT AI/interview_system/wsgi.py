@@ -5,5 +5,5 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "interview_system.settings")
 
 application = get_wsgi_application()
 
-# Required for Vercel:
+# Alias for Vercel
 app = application
